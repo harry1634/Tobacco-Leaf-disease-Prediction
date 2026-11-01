@@ -1,0 +1,55 @@
+rules_version = '2';
+
+// Data model: everything belongs to a user under users/{userId}/...
+//   users/{uid}/experiments/{expId}          experiment config + summary metrics (imported)
+//   users/{uid}/experiments/{expId}/rounds   per-round metrics (imported)
+//   users/{uid}/predictions/{id}             metadata of diagnosis predictions
+//
+// Experiment data is written only by the Python import script using the Firebase Admin SDK,
+// which bypasses these rules. Browsers can read their own experiments but never write them.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+
+      match /experiments/{expId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+
+        match /rounds/{roundId} {
+          allow read: if isOwner(userId);
+          allow write: if false;
+        }
+      }
+
+      // Prediction metadata only (no images, no model output beyond label + confidence).
+      match /predictions/{predictionId} {
+        allow read, delete: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['label', 'confidence', 'modelVersion', 'createdAt'])
+          && request.resource.data.keys().hasAll(['label', 'confidence', 'createdAt'])
+          && request.resource.data.label is string
+          && request.resource.data.label.size() > 0
+          && request.resource.data.label.size() <= 64
+          && request.resource.data.confidence is number
+          && request.resource.data.confidence >= 0
+          && request.resource.data.confidence <= 1
+          && request.resource.data.createdAt == request.time;
+        allow update: if false;
+      }
+    }
+
+    // Everything else is denied by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

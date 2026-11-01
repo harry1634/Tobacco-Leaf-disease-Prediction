@@ -1,0 +1,40 @@
+# Dependencies / builds
+node_modules/
+.next/
+out/
+.vercel/
+
+# Secrets - never commit
+.env
+.env.*
+!.env.example
+*serviceAccount*.json
+*service-account*.json
+kaggle.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# ML data and heavy artifacts (dataset stays local / in Colab)
+ml/data/*
+!ml/data/.gitkeep
+ml/outputs/*
+!ml/outputs/.gitkeep
+!ml/outputs/**/*.json
+*.pt
+*.pth
+
+# Firebase local
+.firebase/
+firebase-debug.log
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Colab upload bundle
+*.zip

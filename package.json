@@ -1,0 +1,12 @@
+{
+  "name": "tobacco-fl-project",
+  "private": true,
+  "description": "Convenience scripts so the web app can be started from the repository root. The app itself lives in web/.",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "lint": "npm --prefix web run lint",
+    "test:rules": "npm --prefix web run test:rules",
+    "test:import": "npm --prefix web run test:import"
+  }
+}

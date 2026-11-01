@@ -1,0 +1,41 @@
+# One config drives all four experiments, so they share data, model and training settings.
+# Only `selection` and `compression` differ between A, B, C and D.
+data:
+  img_size: 160
+  include_synthetic: false      # train on real photographs only
+
+model:
+  name: mobilenet_v2
+  pretrained: true              # ImageNet weights, then fine-tuned
+
+federated:
+  num_clients: 8
+  clients_per_round: 4
+  rounds: 20
+  local_epochs: 1
+  batch_size: 32
+  lr: 0.01
+  distribution: non-iid         # iid | non-iid
+  dirichlet_alpha: 0.5          # smaller = more skewed class mixes per client
+  min_client_size: 20
+  seed: 42
+
+adaptive:                       # client-selection score weights (see src/federated/selection.py)
+  w_loss: 0.5
+  w_stale: 0.3
+  w_size: 0.2
+
+compression:
+  topk_ratio: 0.1               # fraction of update entries sent
+  error_feedback: true
+
+centralised:
+  epochs: 15
+  batch_size: 32
+  lr: 0.01
+
+experiments:
+  A: {name: "A: FedAvg baseline",              selection: random,   compression: none}
+  B: {name: "B: FedAvg + adaptive selection",  selection: adaptive, compression: none}
+  C: {name: "C: FedAvg + Top-k compression",   selection: random,   compression: topk}
+  D: {name: "D: FedAvg + adaptive + Top-k",    selection: adaptive, compression: topk}
