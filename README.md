@@ -25,13 +25,17 @@ python -m pytest tests -q
 **Built and tested**
 - Web: landing, register / login / logout, protected routes, dashboard, experiments list and detail (per-class, per-client, confusion matrix), results charts with table views, project information page, diagnosis page (validation and preview).
 - Firestore security rules, tested on the local emulator (10 tests).
-- ML: dataset loader and audit, MobileNetV2, FedAvg on Flower, adaptive client selection, Top-k compression with error feedback, communication accounting, results export and import (14 unit tests; smoke runs of experiments A, B and D; the import-to-web path tested on the emulator).
+- ML: dataset loader and audit, MobileNetV2, FedAvg on Flower, adaptive client selection, Top-k compression with error feedback, communication accounting, results export and import (20 unit tests; smoke runs of experiments A, B and D; the import-to-web path tested on the emulator).
+- A centralised (non-federated) baseline classifier, trained on a Colab GPU: 84.1% accuracy and macro-F1 0.729 on 138 held-out test photos (about +/-6 points of uncertainty; four classes have a single test photo). Trained with `ml/colab/train_on_colab.ipynb`; the model file is not in the repository.
+- A prediction service (`ml/src/serve/app.py`, FastAPI) and a diagnosis page with plain-language disease explanations. It works locally; it has not been tested on photos from other sources, and three informal checks on such photos were all wrong.
 
 **Not done yet**
-- **No real experiment results exist.** Only 2-round smoke tests were run, to prove the code works. The dashboard is empty until you run the full experiments and import them. No numbers have been invented.
-- Real image prediction: needs a hosted model service. The diagnosis page shows "no model connected" until one exists.
+- **No real federated experiment results exist.** Only tiny smoke tests of A, B and D were run, to prove the code works. The dashboard is empty until you run the full experiments (recommended on a Colab GPU) and import them. No numbers have been invented.
+- The prediction service runs only on a local PC. A deployed website shows "no model connected" until the service is hosted somewhere reachable.
 - Experiment C (random selection + Top-k) has not had its own smoke run, though both its parts are exercised by A, B and D.
-- Deployment to Vercel (see `docs/deployment.md`) is for you to do; GPU use on Colab is untested.
+- Deployment to Vercel (see `docs/deployment.md`) is for you to do; the GPU path for the federated runs is untested.
+
+A full write-up with results, limitations and remaining work is in `docs/Project_Report.pdf`.
 
 ## Tests
 | | |
