@@ -79,4 +79,5 @@ async def predict(file: UploadFile = File(...)) -> dict:
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=int(os.environ.get("PORT", "8000")))
+    # HOST stays local by default; a container sets HOST=0.0.0.0 so the hosting platform can reach it.
+    uvicorn.run(app, host=os.environ.get("HOST", "127.0.0.1"), port=int(os.environ.get("PORT", "8000")))

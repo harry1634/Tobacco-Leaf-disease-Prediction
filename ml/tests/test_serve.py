@@ -77,3 +77,10 @@ def test_white_balance_removes_colour_cast():
     cast = np.stack([np.full((8, 8), v, dtype=np.float32) for v in (200, 100, 50)], axis=-1)
     out = shades_of_gray(cast)
     assert np.ptp(out.mean(axis=(0, 1))) < np.ptp(cast.mean(axis=(0, 1)))
+
+
+def test_deployed_function_uses_identical_preprocessing():
+    """web/api/_preprocess.py must stay a byte-for-byte copy, or the live site would prepare photos differently."""
+    web_copy = ML_ROOT.parent / "web" / "api" / "_preprocess.py"
+    original = ML_ROOT / "src" / "serve" / "preprocess.py"
+    assert web_copy.read_text(encoding="utf-8") == original.read_text(encoding="utf-8")

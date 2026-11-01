@@ -61,7 +61,7 @@ export function DiagnosisPanel() {
     <div className="grid gap-6 lg:grid-cols-2">
       <section className="rounded-lg border border-border bg-surface p-5" aria-labelledby="up">
         <h2 id="up" className="font-medium">1. Choose a leaf image</h2>
-        <p className="mt-1 text-sm text-muted">JPEG, PNG or WebP, up to 5 MB. The image stays in your browser and is not uploaded unless a model service is connected.</p>
+        <p className="mt-1 text-sm text-muted">JPEG, PNG or WebP, up to 15 MB (large photos are shrunk before sending). The image stays in your browser and is not uploaded unless a model service is connected.</p>
         <label htmlFor="leaf" className="mt-4 block text-sm font-medium">Tobacco leaf image</label>
         <input id="leaf" type="file" accept={ALLOWED_TYPES.join(",")} onChange={onPick}
           aria-describedby={fileError ? "leaf-err" : undefined} aria-invalid={Boolean(fileError)}
