@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ExperimentPlan } from "@/components/experiments/ExperimentPlan";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useExperiments } from "@/hooks/useExperiments";
 import { fmtDate, fmtText } from "@/lib/experiments";
@@ -14,10 +15,13 @@ export function ExperimentsTable() {
   if (error) return <p role="alert" className="rounded-md bg-warning-soft p-3 text-sm text-warning">{error}</p>;
   if (experiments.length === 0) {
     return (
-      <EmptyState
-        title="No experiments imported"
-        message="Run the Python pipeline and import its results to see experiments here."
-      />
+      <div className="space-y-6">
+        <EmptyState
+          title="No experiments imported yet"
+          message="Once the Python pipeline has run and its results are imported, each run appears here as a row you can open."
+        />
+        <ExperimentPlan />
+      </div>
     );
   }
 

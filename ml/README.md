@@ -30,7 +30,8 @@ Rules applied in code (`src/dataset/tla.py`):
 | One experiment (A to D) | `python -m src.federated.run_experiment --exp A` |
 | Quick pipeline check of one | `python -m src.federated.run_experiment --exp D --smoke` |
 | All four, then compare | `python -m src.federated.run_all` |
-| Compare finished runs | `python -m src.export.compare` |
+| Compare finished runs | `python -m src.export.compare` (add `--seed 42` to compare one seed) |
+| All four on a Colab GPU | open `colab/federated_on_colab.ipynb` |
 | Import into Firestore | `python -m src.export.import_to_firestore --uid <UID> --service-account <key.json>` |
 
 Smoke runs use 4 clients, 2 rounds and 160 images. They only prove the code runs. They are labelled "(smoke test)" and are excluded from comparisons and imports unless you pass `--include-smoke`.

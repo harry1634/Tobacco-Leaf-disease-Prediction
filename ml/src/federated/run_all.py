@@ -19,8 +19,9 @@ if __name__ == "__main__":
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--rounds", type=int)
     ap.add_argument("--seed", type=int)
+    ap.add_argument("--cpu", action="store_true")
     a = ap.parse_args()
-    extra = (["--smoke"] if a.smoke else []) + (["--rounds", str(a.rounds)] if a.rounds else []) + (["--seed", str(a.seed)] if a.seed else [])
+    extra = (["--smoke"] if a.smoke else []) + (["--rounds", str(a.rounds)] if a.rounds else []) + (["--seed", str(a.seed)] if a.seed else []) + (["--cpu"] if a.cpu else [])
     for exp in "ABCD":
         print(f"\n=== Experiment {exp} ===", flush=True)
         # Ray on Windows occasionally fails to start a worker; a fresh process normally succeeds, so retry.

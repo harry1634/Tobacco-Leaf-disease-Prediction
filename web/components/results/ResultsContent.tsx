@@ -3,9 +3,20 @@
 import { useMemo, useState } from "react";
 import { BarChartGrouped, type BarRow } from "@/components/charts/BarChartGrouped";
 import { LineChartMulti, type Row, type Series } from "@/components/charts/LineChartMulti";
+import { ExperimentPlan } from "@/components/experiments/ExperimentPlan";
+import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useResults, type ExperimentWithRounds } from "@/hooks/useResults";
 import { fmtBytes, fmtPercent, fmtScore, fmtText } from "@/lib/experiments";
+
+const coming = [
+  ["Accuracy and macro-F1 per round", "Shows how quickly each method learns."],
+  ["Training and validation loss", "Shows whether training is stable or overfitting."],
+  ["Cumulative communication cost", "The main question: does adaptive selection plus compression send fewer bytes?"],
+  ["Final precision, recall and F1", "Held-out test scores for each experiment."],
+  ["Client participation", "How often each client was picked, to check selection is fair."],
+  ["Comparison table", "All experiments side by side, with missing values shown as a dash."],
+];
 
 const MAX_SERIES = 8; // the validated palette has 8 fixed slots; beyond that, charts would be unreadable
 
@@ -33,7 +44,19 @@ export function ResultsContent() {
   if (loading) return <p role="status" className="text-muted">Loading results…</p>;
   if (error) return <p role="alert" className="rounded-md bg-warning-soft p-3 text-sm text-warning">{error}</p>;
   if (all.length === 0) {
-    return <EmptyState title="No results to chart" message="Charts display only data imported from real experiments. Run the Python pipeline and import its results." />;
+    return (
+      <div className="space-y-6">
+        <EmptyState title="No results to chart yet" message="Charts display only data imported from real experiments. Nothing here is simulated, so this page stays empty until results are imported." />
+        <Card title="Charts that will appear here">
+          <ul className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+            {coming.map(([name, text]) => (
+              <li key={name}><span className="font-medium">{name}</span><span className="block text-muted">{text}</span></li>
+            ))}
+          </ul>
+        </Card>
+        <ExperimentPlan />
+      </div>
+    );
   }
 
   const colorOf = (id: string) => `var(--series-${all.findIndex((e) => e.id === id) + 1})`;

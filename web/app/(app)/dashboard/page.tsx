@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Dashboard" };
 export default function DashboardPage() {
   return (
     <>
-      <PageHeader title="Dashboard" description="Overview of your imported federated-learning experiments." />
+      <PageHeader title="Dashboard" description="Your diagnoses, project progress and imported federated-learning experiments." />
       <DashboardContent />
     </>
   );

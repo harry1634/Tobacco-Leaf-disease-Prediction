@@ -2,6 +2,7 @@
 
     python -m src.export.compare                    # uses outputs/*-full-*/result.json
     python -m src.export.compare --include-smoke    # also include smoke-test runs (for pipeline checks only)
+    python -m src.export.compare --seed 42          # only runs made with that seed
 
 Writes outputs/comparison.json and outputs/comparison.md.
 "Rounds to common target": target = 95% of the LOWEST best validation accuracy among the compared
@@ -17,8 +18,10 @@ from pathlib import Path
 ML_ROOT = Path(__file__).resolve().parents[2]
 
 
-def load_runs(include_smoke: bool) -> list[dict]:
+def load_runs(include_smoke: bool, seed: int | None = None) -> list[dict]:
     pattern = "*-*-s*" if include_smoke else "*-full-s*"
+    if seed is not None:  # compare one seed at a time so experiment A is always the baseline
+        pattern = pattern[:-1] + str(seed)
     runs = [json.loads(p.read_text(encoding="utf-8")) for p in sorted((ML_ROOT / "outputs").glob(f"{pattern}/result.json"))]
     return runs
 
@@ -57,8 +60,9 @@ def to_markdown(rows: list[dict]) -> str:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--include-smoke", action="store_true")
+    ap.add_argument("--seed", type=int)
     a = ap.parse_args()
-    runs = load_runs(a.include_smoke)
+    runs = load_runs(a.include_smoke, a.seed)
     if not runs:
         raise SystemExit("No result files found in outputs/. Run the experiments first.")
     rows = compare(runs)

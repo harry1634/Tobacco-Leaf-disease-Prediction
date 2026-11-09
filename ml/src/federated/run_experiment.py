@@ -15,7 +15,6 @@ import os
 import sys
 from pathlib import Path
 
-import numpy as np
 import torch
 import yaml
 
@@ -33,6 +32,7 @@ from src.federated.client_app import app as client_app  # noqa: E402
 from src.federated.common import data_args, get_data  # noqa: E402
 from src.federated.server import TobaccoStrategy  # noqa: E402
 from src.models.mobilenet import build_model, get_vector  # noqa: E402
+from src.training.local import gpu_allowed  # noqa: E402
 
 
 def load_config(path: Path, smoke: bool, overrides: dict) -> dict:
@@ -61,6 +61,7 @@ def run(cfg: dict, exp_key: str, out_root: Path, smoke: bool) -> Path:
         "seed": f["seed"], "max_train": max_train, "local_epochs": f["local_epochs"], "batch_size": f["batch_size"],
         "lr": f["lr"], "compression": exp["compression"], "topk_ratio": comp["topk_ratio"],
         "error_feedback": comp["error_feedback"], "threads": threads,
+        "force_cpu": os.environ.get("FL_FORCE_CPU") == "1",  # sent to each client, which applies it in its own process
     }
     data, parts = get_data(*data_args(flat))
     class_names = data["class_names"]
@@ -81,7 +82,7 @@ def run(cfg: dict, exp_key: str, out_root: Path, smoke: bool) -> Path:
         server_app=server_app, client_app=client_app, num_supernodes=int(f["num_clients"]),
         # With a GPU, clients share it (each takes 1/clients_per_round of it); without one, num_gpus is 0.
         backend_config={"client_resources": {"num_cpus": threads,
-                                             "num_gpus": (1.0 / int(f["clients_per_round"])) if torch.cuda.is_available() else 0.0},
+                                             "num_gpus": (1.0 / int(f["clients_per_round"])) if gpu_allowed() else 0.0},
                         "init_args": {"include_dashboard": False}},
     )
 
@@ -125,6 +126,9 @@ if __name__ == "__main__":
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--rounds", type=int)
     ap.add_argument("--seed", type=int)
+    ap.add_argument("--cpu", action="store_true", help="run everything on the CPU (workaround if GPU workers crash)")
     a = ap.parse_args()
+    if a.cpu:
+        os.environ["FL_FORCE_CPU"] = "1"
     cfg = load_config(Path(a.config), a.smoke, {"rounds": a.rounds, "seed": a.seed})
     run(cfg, a.exp, ML_ROOT / "outputs", a.smoke)

@@ -30,6 +30,8 @@ Nothing here has been done for you: deploying and creating accounts are your dec
 
 ## Real predictions on the deployed site (ONNX function on Vercel)
 
+The model in `web/api/_model/` is `final_all`: trained on all 1,398 real photos, so it has no held-out score (see the README). Its parity check against PyTorch (138/138 same class) only shows the conversion is faithful, not that the model is accurate.
+
 Hugging Face Docker Spaces now need a paid plan, so the model runs as a Vercel Python function instead, next to the website (same address, free Hobby plan, no second host).
 
 - `web/api/predict.py` is the function. It uses `onnxruntime` (no PyTorch) and the converted model in `web/api/_model/` (about 9 MB, committed to git). `web/vercel.json` bundles that folder and `web/requirements.txt` lists the Python packages.

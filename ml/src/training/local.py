@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import os
 
 import numpy as np
 import torch
@@ -12,9 +13,14 @@ _MEAN = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
 _STD = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
 
 
+def gpu_allowed() -> bool:
+    """True when a GPU exists and FL_FORCE_CPU=1 is not set (a workaround if GPU workers crash)."""
+    return torch.cuda.is_available() and os.environ.get("FL_FORCE_CPU") != "1"
+
+
 def pick_device() -> torch.device:
     """Use the GPU when PyTorch can see one (for example on Colab), otherwise the CPU."""
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return torch.device("cuda" if gpu_allowed() else "cpu")
 
 
 def _strong_augment(x: torch.Tensor, gen: torch.Generator | None) -> torch.Tensor:

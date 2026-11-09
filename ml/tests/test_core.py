@@ -121,3 +121,40 @@ def test_strong_augment_keeps_shape_range_and_changes_pixels():
     aug = _prepare(xb, True, torch.Generator().manual_seed(1), strong=True)
     assert aug.shape == plain.shape and torch.isfinite(aug).all()
     assert not torch.allclose(aug, plain)
+
+
+def test_force_cpu_switch_overrides_gpu(monkeypatch):
+    from src.training.local import gpu_allowed, pick_device
+    monkeypatch.setenv("FL_FORCE_CPU", "1")
+    assert not gpu_allowed()
+    assert pick_device().type == "cpu"
+
+
+def test_buffer_mask_marks_only_batchnorm_statistics():
+    from src.models.mobilenet import buffer_mask, build_model, float_keys, get_vector
+    m = build_model(4, pretrained=False)
+    mask = buffer_mask(m)
+    assert mask.size == get_vector(m).size
+    sd = m.state_dict()
+    expected = sum(sd[k].numel() for k in float_keys(m) if k.endswith(("running_mean", "running_var")))
+    assert int(mask.sum()) == expected and 0 < expected < mask.size * 0.05  # a small share of the model
+
+
+def test_split_update_sends_weights_sparsely_and_statistics_densely():
+    from src.compression import topk
+    from src.models.mobilenet import buffer_mask, build_model, get_vector, set_vector
+    m = build_model(4, pretrained=False)
+    mask, base = buffer_mask(m), get_vector(m)
+    rng = np.random.default_rng(0)
+    vec, residual = base.copy(), None
+    for _ in range(30):  # many compressed rounds
+        delta = rng.normal(0, 0.05, base.size).astype(np.float32)
+        ids, vals, residual = topk.compress(delta[~mask], 0.1, residual)
+        full = np.zeros(base.size, np.float32)
+        full[~mask] = topk.decompress(ids, vals, int((~mask).sum()))
+        full[mask] = delta[mask]  # statistics travel densely, exactly as sent
+        vec = vec + full
+    # the weights part moved only through the sparse path
+    assert np.count_nonzero(vec[~mask] - base[~mask]) < (~mask).sum()
+    set_vector(m, vec)  # still loads cleanly
+    assert np.isfinite(get_vector(m)).all()

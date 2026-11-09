@@ -37,3 +37,13 @@ def set_vector(model: nn.Module, vec: np.ndarray) -> None:
         offset += n
     if offset != vec.size:
         raise ValueError(f"vector has {vec.size} values but the model needs {offset}")
+
+
+def buffer_mask(model: nn.Module) -> np.ndarray:
+    """True for the entries of the flat vector that are BatchNorm running statistics (not learned weights).
+
+    Running statistics are not gradients (a variance can never be negative), so compression must not touch them.
+    """
+    sd = model.state_dict()
+    parts = [np.full(sd[k].numel(), k.endswith(("running_mean", "running_var")), dtype=bool) for k in float_keys(model)]
+    return np.concatenate(parts)

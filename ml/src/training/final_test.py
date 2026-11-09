@@ -30,6 +30,8 @@ def main() -> None:
     out = ML_ROOT / "outputs" / a.out
     result_path = out / "result.json"
     result = json.loads(result_path.read_text(encoding="utf-8"))
+    if result.get("trainedOn") == "train+val+test":
+        sys.exit(f"{a.out} was trained on the test photos too, so a test score would be meaningless. Quote the earlier held-out score instead.")
     if "test" in result:
         sys.exit(f"{a.out} already has a test result; refusing to evaluate the test set again.")
     ckpt = torch.load(out / "model.pt", map_location="cpu")

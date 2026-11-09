@@ -20,7 +20,7 @@ from src.compression import topk
 from src.evaluation.metrics import compute_metrics
 from src.federated.common import data_args, get_data
 from src.federated.selection import AdaptiveSelector, RandomSelector
-from src.models.mobilenet import build_model, set_vector
+from src.models.mobilenet import buffer_mask, build_model, set_vector
 from src.training.local import evaluate
 
 
@@ -39,6 +39,7 @@ class TobaccoStrategy(FedAvg):
         self.sizes: dict[int, int] = {}
         self.global_vec: np.ndarray | None = None
         self.model = build_model(len(class_names), pretrained=False)
+        self.is_buf = buffer_mask(self.model)
         self.rounds: list[dict] = []
         self._pending: dict | None = None
         self.times_selected = {i: 0 for i in range(self.n_clients)}
@@ -94,11 +95,18 @@ class TobaccoStrategy(FedAvg):
             loss = float(r.content["metrics"]["train-loss"])
             parts = r.content["arrays"].to_numpy_ndarrays()
             uplink += sum(int(a.nbytes) for a in parts)
-            delta = parts[0] if len(parts) == 1 else topk.decompress(parts[0], parts[1], size)
+            if len(parts) == 1:
+                delta = parts[0]
+            else:  # [indices, values, buffers]: sparse weights + dense BatchNorm statistics
+                delta = np.zeros(size, dtype=np.float32)
+                delta[~self.is_buf] = topk.decompress(parts[0], parts[1], int((~self.is_buf).sum()))
+                delta[self.is_buf] = parts[2]
             avg_delta += (n / total) * delta
             loss_sum += (n / total) * loss
             self.selector.report(pid, loss, server_round)
         self.global_vec = (self.global_vec + avg_delta).astype(np.float32)
+        if not np.isfinite(self.global_vec).all():  # fail loudly instead of running on with a broken model
+            raise RuntimeError(f"the global model contains NaN/inf after round {server_round}")
         p = self._pending
         p.update(uplinkBytes=uplink, commBytes=uplink + p["downlinkBytes"], trainLoss=loss_sum,
                  selectedClients=[str(c) for c in p["selected"]])
