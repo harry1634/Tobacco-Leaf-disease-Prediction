@@ -36,8 +36,8 @@ It is small but not ours to redistribute (the source repository states no explic
 
 ## Federated round (what the code does)
 1. `TobaccoStrategy.configure_train` picks clients (random or adaptive score).
-2. Each `ClientApp.train` rebuilds the model from the global vector, trains locally, forms `delta = new - old`, and, for Top-k, sends the largest 10% of entries (indices + values), keeping the rest as an error-feedback residual.
-3. `aggregate_train` zero-fills sparse updates, averages weighted by local image count, and adds the result to the global vector.
+2. Each `ClientApp.train` rebuilds the model from the global vector, trains locally, forms `delta = new - old`, and, for Top-k, sends the largest 10% of the learned-weight entries (indices + values), keeping the rest as an error-feedback residual. BatchNorm running statistics (1.5% of the model) are never compressed: they are sent in full alongside the sparse update, because a sparse, error-corrected update can make a variance negative and turn the model into NaN.
+3. `aggregate_train` zero-fills the sparse weight updates, puts the dense BatchNorm statistics back, averages weighted by local image count, and adds the result to the global vector.
 4. `evaluate_global` scores the new global model on the validation set and logs the round, including bytes.
 
 ## Observed trade-off

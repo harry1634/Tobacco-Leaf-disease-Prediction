@@ -29,18 +29,12 @@ python -m pytest tests -q
 python -m src.federated.run_experiment --exp D --smoke     # quick check, about 1-2 minutes
 ```
 
-### Full runs on Google Colab (recommended)
-CPU training of the full experiments takes hours; a free Colab GPU is much faster. Runtime must be set to GPU (Runtime, Change runtime type).
-1. Upload the `ml/` folder to Google Drive (without `.venv`, `data/` and `outputs/`), or push the repo to GitHub and clone it.
-2. In a notebook:
-   ```python
-   from google.colab import drive; drive.mount('/content/drive')
-   %cd /content/drive/MyDrive/ml
-   !pip install -q flwr[simulation] datasets scikit-learn pyyaml firebase-admin
-   !python -m src.federated.run_all
-   ```
-   Colab already has PyTorch. The code uses the GPU automatically when PyTorch can see one (and the CPU otherwise). The GPU path has not been tested, because the development PC has no GPU; if it fails on Colab, send the error message.
-3. Download `outputs/` (the `result.json` files) back to your PC.
+### Full runs on Google Colab (tested)
+Use the notebook `ml/colab/federated_on_colab.ipynb` (upload it to Colab with File, Upload notebook). It walks through every step: upload the code zip (`python colab\make_zip.py` creates `ml/ml_for_colab.zip`), install, a smoke test, experiments A to D, a Drive backup, the comparison and the download.
+- **Run on the CPU.** On the Colab GPU image we tested, the client processes crashed inside PyTorch's CUDA dropout step. The notebook's section 3b switches everything to the CPU (`--cpu`), which worked: about 14 minutes per experiment (20 rounds), roughly an hour for all four. The GPU path remains unverified.
+- Colab resets lose everything in `/content`, so run the notebook's Drive backup cell after each experiment.
+- Extra seeds (`--seed N`) are in the notebook's last section; compare one seed at a time with `python -m src.export.compare --seed 42`.
+- Download `fl_results.zip` and unzip it into `ml/outputs/` on your PC.
 
 Never put the Firebase service-account key into a Colab notebook that you share. Run the import on your own PC.
 

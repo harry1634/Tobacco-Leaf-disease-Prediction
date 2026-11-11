@@ -57,7 +57,7 @@ export default function AboutPage() {
           </Card>
           <Card title="Top-k update compression">
             <p className="text-sm leading-6">
-              A client keeps only the k% of update values with the largest magnitude (default 10%) and sends their positions and values.
+              A client keeps only the k% of learned-weight update values with the largest magnitude (default 10%) and sends their positions and values. The small BatchNorm statistics are not compressed; they are always sent in full.
               The server rebuilds a full-size update by filling the rest with zeros. The values that were not sent are remembered on
               the client and added to its next update (error feedback), so information is delayed rather than lost. A sparse entry
               costs 8 bytes (4 for the position, 4 for the value) against 4 bytes for a dense one.

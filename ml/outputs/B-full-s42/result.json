@@ -1,0 +1,909 @@
+{
+  "id": "B-full-s42",
+  "name": "B: FedAvg + adaptive selection",
+  "status": "completed",
+  "createdAt": "2026-11-01T12:45:43.695508+00:00",
+  "config": {
+    "numClients": 8,
+    "clientsPerRound": 4,
+    "rounds": 20,
+    "selectionStrategy": "adaptive",
+    "compression": "none",
+    "topkRatio": null,
+    "distribution": "non-iid",
+    "model": "mobilenet_v2",
+    "dataset": "TLA 16-class (real images only), 1122 train images",
+    "seed": 42
+  },
+  "summary": {
+    "accuracy": 0.8478260869565217,
+    "macroPrecision": 0.7028273809523808,
+    "macroRecall": 0.6974206349206349,
+    "macroF1": 0.687996562261268,
+    "roundsToConvergence": 20,
+    "totalCommBytes": 1458227200,
+    "uplinkBytes": 729113600
+  },
+  "classNames": [
+    "anthracnose",
+    "black_shank",
+    "brown_spot",
+    "cmv",
+    "frog_eye",
+    "genetic_abnormality",
+    "healthy",
+    "nematodes",
+    "potato_tuber_moth",
+    "pvy",
+    "sunscald",
+    "target_spot",
+    "tmv",
+    "tswv",
+    "weather_fleck",
+    "wildfire"
+  ],
+  "perClass": [
+    {
+      "label": "anthracnose",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    {
+      "label": "black_shank",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    {
+      "label": "brown_spot",
+      "precision": 0.75,
+      "recall": 0.9,
+      "f1": 0.8181818181818182,
+      "support": 10
+    },
+    {
+      "label": "cmv",
+      "precision": 0.7142857142857143,
+      "recall": 1.0,
+      "f1": 0.8333333333333334,
+      "support": 10
+    },
+    {
+      "label": "frog_eye",
+      "precision": 0.8333333333333334,
+      "recall": 1.0,
+      "f1": 0.9090909090909091,
+      "support": 10
+    },
+    {
+      "label": "genetic_abnormality",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 1
+    },
+    {
+      "label": "healthy",
+      "precision": 0.9,
+      "recall": 0.9,
+      "f1": 0.9,
+      "support": 10
+    },
+    {
+      "label": "nematodes",
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666,
+      "support": 8
+    },
+    {
+      "label": "potato_tuber_moth",
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "f1": 0.8,
+      "support": 10
+    },
+    {
+      "label": "pvy",
+      "precision": 0.6666666666666666,
+      "recall": 0.5,
+      "f1": 0.5714285714285714,
+      "support": 8
+    },
+    {
+      "label": "sunscald",
+      "precision": 0.7857142857142857,
+      "recall": 0.7857142857142857,
+      "f1": 0.7857142857142857,
+      "support": 14
+    },
+    {
+      "label": "target_spot",
+      "precision": 1.0,
+      "recall": 0.7,
+      "f1": 0.8235294117647058,
+      "support": 10
+    },
+    {
+      "label": "tmv",
+      "precision": 0.9285714285714286,
+      "recall": 0.9285714285714286,
+      "f1": 0.9285714285714286,
+      "support": 14
+    },
+    {
+      "label": "tswv",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    {
+      "label": "weather_fleck",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 12
+    },
+    {
+      "label": "wildfire",
+      "precision": 1.0,
+      "recall": 0.9444444444444444,
+      "f1": 0.9714285714285714,
+      "support": 18
+    }
+  ],
+  "perClient": [
+    {
+      "clientId": "0",
+      "numSamples": 111,
+      "timesSelected": 10,
+      "accuracy": 0.954954954954955
+    },
+    {
+      "clientId": "1",
+      "numSamples": 171,
+      "timesSelected": 8,
+      "accuracy": 0.9239766081871345
+    },
+    {
+      "clientId": "2",
+      "numSamples": 176,
+      "timesSelected": 8,
+      "accuracy": 0.9829545454545454
+    },
+    {
+      "clientId": "3",
+      "numSamples": 105,
+      "timesSelected": 10,
+      "accuracy": 0.9714285714285714
+    },
+    {
+      "clientId": "4",
+      "numSamples": 53,
+      "timesSelected": 13,
+      "accuracy": 0.9433962264150944
+    },
+    {
+      "clientId": "5",
+      "numSamples": 92,
+      "timesSelected": 12,
+      "accuracy": 0.967391304347826
+    },
+    {
+      "clientId": "6",
+      "numSamples": 131,
+      "timesSelected": 11,
+      "accuracy": 0.9923664122137404
+    },
+    {
+      "clientId": "7",
+      "numSamples": 283,
+      "timesSelected": 8,
+      "accuracy": 0.9823321554770318
+    }
+  ],
+  "confusionMatrix": [
+    {
+      "actual": "anthracnose",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "black_shank",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "brown_spot",
+      "counts": [
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "cmv",
+      "counts": [
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "frog_eye",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "genetic_abnormality",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "healthy",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "nematodes",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4,
+        2,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "potato_tuber_moth",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "pvy",
+      "counts": [
+        0,
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "sunscald",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        11,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "target_spot",
+      "counts": [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        7,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "tmv",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        13,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "tswv",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "actual": "weather_fleck",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        12,
+        0
+      ]
+    },
+    {
+      "actual": "wildfire",
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        17
+      ]
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "accuracy": 0.34057971014492755,
+      "macroPrecision": 0.1622649903416157,
+      "macroRecall": 0.2316468253968254,
+      "macroF1": 0.1720383430038935,
+      "valLoss": 2.339871268341507,
+      "trainLoss": 1.8942844186286576,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "1",
+        "2",
+        "6",
+        "7"
+      ]
+    },
+    {
+      "round": 2,
+      "accuracy": 0.3188405797101449,
+      "macroPrecision": 0.25503655743481324,
+      "macroRecall": 0.2649553571428571,
+      "macroF1": 0.19342160708731726,
+      "valLoss": 1.9559845025988594,
+      "trainLoss": 2.5033103171478017,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "round": 3,
+      "accuracy": 0.6159420289855072,
+      "macroPrecision": 0.4765836695983755,
+      "macroRecall": 0.4331597222222222,
+      "macroF1": 0.3973015864986939,
+      "valLoss": 1.3828809088554934,
+      "trainLoss": 1.4009688837041576,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "1",
+        "2",
+        "3",
+        "6"
+      ]
+    },
+    {
+      "round": 4,
+      "accuracy": 0.572463768115942,
+      "macroPrecision": 0.4069099903829597,
+      "macroRecall": 0.39848710317460323,
+      "macroF1": 0.3239023421084614,
+      "valLoss": 1.7659880596658457,
+      "trainLoss": 1.1841349696847636,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "4",
+        "5",
+        "7"
+      ]
+    },
+    {
+      "round": 5,
+      "accuracy": 0.5942028985507246,
+      "macroPrecision": 0.4286336105415053,
+      "macroRecall": 0.4506944444444445,
+      "macroF1": 0.3819487983281087,
+      "valLoss": 1.3489330540532651,
+      "trainLoss": 1.3680571636654706,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "1",
+        "2",
+        "3",
+        "6"
+      ]
+    },
+    {
+      "round": 6,
+      "accuracy": 0.782608695652174,
+      "macroPrecision": 0.6172737030878478,
+      "macroRecall": 0.5977678571428572,
+      "macroF1": 0.5861339566892073,
+      "valLoss": 0.7878022159355275,
+      "trainLoss": 1.2042676567723276,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "4",
+        "5",
+        "6"
+      ]
+    },
+    {
+      "round": 7,
+      "accuracy": 0.6666666666666666,
+      "macroPrecision": 0.5423188653451811,
+      "macroRecall": 0.47157738095238094,
+      "macroF1": 0.4241526826396187,
+      "valLoss": 1.1545958484428516,
+      "trainLoss": 0.6562119457456801,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "1",
+        "3",
+        "4",
+        "7"
+      ]
+    },
+    {
+      "round": 8,
+      "accuracy": 0.5507246376811594,
+      "macroPrecision": 0.4586052955665024,
+      "macroRecall": 0.42336309523809523,
+      "macroF1": 0.38559201637611884,
+      "valLoss": 1.2869076383286628,
+      "trainLoss": 1.085396143618752,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "2",
+        "5",
+        "6"
+      ]
+    },
+    {
+      "round": 9,
+      "accuracy": 0.6521739130434783,
+      "macroPrecision": 0.5416779401154401,
+      "macroRecall": 0.4760912698412698,
+      "macroF1": 0.4311447623749175,
+      "valLoss": 1.2572191279867422,
+      "trainLoss": 0.959999068648909,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "3",
+        "4",
+        "5",
+        "7"
+      ]
+    },
+    {
+      "round": 10,
+      "accuracy": 0.8478260869565217,
+      "macroPrecision": 0.6404090802987862,
+      "macroRecall": 0.6445436507936508,
+      "macroF1": 0.6326564452226092,
+      "valLoss": 0.5461114835048068,
+      "trainLoss": 1.072682592141844,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "4",
+        "5",
+        "6"
+      ]
+    },
+    {
+      "round": 11,
+      "accuracy": 0.7391304347826086,
+      "macroPrecision": 0.5516002090015248,
+      "macroRecall": 0.5419890873015872,
+      "macroF1": 0.5047663377812119,
+      "valLoss": 0.7625753793163575,
+      "trainLoss": 0.3661351499126346,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "1",
+        "2",
+        "7"
+      ]
+    },
+    {
+      "round": 12,
+      "accuracy": 0.8623188405797102,
+      "macroPrecision": 0.6537429584304584,
+      "macroRecall": 0.6646825396825397,
+      "macroF1": 0.6473454997306147,
+      "valLoss": 0.5331347783406576,
+      "trainLoss": 0.7895780353173809,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    },
+    {
+      "round": 13,
+      "accuracy": 0.7536231884057971,
+      "macroPrecision": 0.5348018403165462,
+      "macroRecall": 0.554265873015873,
+      "macroF1": 0.5247620690533559,
+      "valLoss": 0.7510522703329722,
+      "trainLoss": 0.387059229834229,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "3",
+        "5",
+        "7"
+      ]
+    },
+    {
+      "round": 14,
+      "accuracy": 0.7536231884057971,
+      "macroPrecision": 0.5205786860198625,
+      "macroRecall": 0.5616071428571429,
+      "macroF1": 0.5233514939464134,
+      "valLoss": 0.8997330872908883,
+      "trainLoss": 0.4986977781451495,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "1",
+        "2",
+        "4",
+        "6"
+      ]
+    },
+    {
+      "round": 15,
+      "accuracy": 0.6956521739130435,
+      "macroPrecision": 0.5117311507936508,
+      "macroRecall": 0.5184771825396826,
+      "macroF1": 0.4848548552529283,
+      "valLoss": 1.1349042291226594,
+      "trainLoss": 0.45209241548902135,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "4",
+        "5",
+        "7"
+      ]
+    },
+    {
+      "round": 16,
+      "accuracy": 0.782608695652174,
+      "macroPrecision": 0.55123556998557,
+      "macroRecall": 0.5844742063492063,
+      "macroF1": 0.5563464106015471,
+      "valLoss": 0.7833091245181318,
+      "trainLoss": 0.7459072838658871,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "1",
+        "3",
+        "4",
+        "6"
+      ]
+    },
+    {
+      "round": 17,
+      "accuracy": 0.7318840579710145,
+      "macroPrecision": 0.5286075036075036,
+      "macroRecall": 0.6003224206349207,
+      "macroF1": 0.5346096458151413,
+      "valLoss": 0.7234473815862683,
+      "trainLoss": 0.35352015922345764,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "round": 18,
+      "accuracy": 0.7536231884057971,
+      "macroPrecision": 0.5640998707175178,
+      "macroRecall": 0.572123015873016,
+      "macroF1": 0.541138918951419,
+      "valLoss": 0.7514149624368419,
+      "trainLoss": 0.3289795615606838,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "3",
+        "6",
+        "7"
+      ]
+    },
+    {
+      "round": 19,
+      "accuracy": 0.7681159420289855,
+      "macroPrecision": 0.6052989130434783,
+      "macroRecall": 0.6850446428571428,
+      "macroF1": 0.6184715732398799,
+      "valLoss": 0.6871344110240107,
+      "trainLoss": 0.38813741498247345,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "0",
+        "2",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "round": 20,
+      "accuracy": 0.8840579710144928,
+      "macroPrecision": 0.8355498667998669,
+      "macroRecall": 0.8506696428571429,
+      "macroF1": 0.8274150423319221,
+      "valLoss": 0.4043105339658433,
+      "trainLoss": 0.43608308276479324,
+      "commBytes": 72911360,
+      "uplinkBytes": 36455680,
+      "downlinkBytes": 36455680,
+      "selectedClients": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    }
+  ]
+}

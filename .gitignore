@@ -10,6 +10,7 @@ out/
 !.env.example
 *serviceAccount*.json
 *service-account*.json
+*firebase-adminsdk*.json
 kaggle.json
 
 # Python
@@ -24,6 +25,9 @@ ml/data/*
 ml/outputs/*
 !ml/outputs/.gitkeep
 !ml/outputs/**/*.json
+# keep the small metrics files of finished runs (never the model weights, which *.pt excludes)
+!ml/outputs/*-full-s*/
+!ml/outputs/centralised*/
 *.pt
 *.pth
 
