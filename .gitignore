@@ -43,3 +43,9 @@ Thumbs.db
 # Colab upload bundle
 *.zip
 
+# Private project documents (reports, papers, slides): keep them on your own computer
+docs/*.pdf
+*.docx
+*.pptx
+*.doc
+*.ppt
