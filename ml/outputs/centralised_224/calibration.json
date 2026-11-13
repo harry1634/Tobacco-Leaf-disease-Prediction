@@ -1,0 +1,6 @@
+{
+  "temperature": 0.55,
+  "views": 4,
+  "fittedOn": "validation photos, centralised_224 model, 4-view averaging (T chosen to minimise log-loss)",
+  "checkedOn": "138 test photos: 4 views, T=0.55 -> 88.4% accuracy, mean confidence 89.5% (single view: 82.6%, 77.7%)"
+}

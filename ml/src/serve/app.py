@@ -7,12 +7,15 @@ POST /predict  (multipart field "file": jpeg/png/webp, max 5 MB)
   -> {"label", "confidence", "top": [{"label", "confidence"}, x3], "modelVersion"}
 GET  /health   -> {"status": "ok", "classes": N}
 
+Each photo is shown to the model four ways (as is, two mirror images, a 90-degree turn) and the answers are averaged.
+
 The model is only loaded from a real training run; the service refuses to start without one.
 Uploaded images are processed in memory and never stored.
 """
 from __future__ import annotations
 
 import io
+import json
 import os
 import sys
 from pathlib import Path
@@ -28,7 +31,7 @@ ML_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ML_ROOT))
 
 from src.models.mobilenet import build_model  # noqa: E402
-from src.serve.preprocess import prepare_image  # noqa: E402
+from src.serve.preprocess import VIEWS, average_probabilities, prepare_image, tta_views  # noqa: E402
 
 MAX_BYTES = 5 * 1024 * 1024
 ALLOWED = {"image/jpeg", "image/png", "image/webp"}
@@ -44,7 +47,10 @@ IMG_SIZE: int = int(ckpt["img_size"])
 model = build_model(len(CLASS_NAMES), pretrained=False)
 model.load_state_dict(ckpt["state_dict"])
 model.eval()
-VERSION = f"{MODEL_DIR}-mobilenet_v2-{IMG_SIZE}px"
+# Calibration written next to the model (see web/api/_model/classes.json for the hosted copy). Missing file -> no rescaling.
+_calib = ckpt_path.parent / "calibration.json"
+TEMPERATURE = float(json.loads(_calib.read_text(encoding="utf-8"))["temperature"]) if _calib.is_file() else 1.0
+VERSION = f"{MODEL_DIR}-mobilenet_v2-{IMG_SIZE}px-tta{VIEWS}"
 
 app = FastAPI(title="Tobacco leaf diagnosis")
 app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["POST", "GET"], allow_headers=["*"])
@@ -70,9 +76,9 @@ async def predict(file: UploadFile = File(...)) -> dict:
     except (UnidentifiedImageError, OSError):
         raise HTTPException(400, "The file is not a readable image.")
 
-    x = torch.from_numpy(prepare_image(img, IMG_SIZE)).unsqueeze(0)
+    x = torch.from_numpy(tta_views(prepare_image(img, IMG_SIZE)))
     with torch.no_grad():
-        probs = torch.softmax(model(x), dim=1)[0].numpy()
+        probs = average_probabilities(model(x).numpy(), TEMPERATURE)
     order = np.argsort(-probs)[:3]
     top = [{"label": CLASS_NAMES[i], "confidence": float(probs[i])} for i in order]
     return {"label": top[0]["label"], "confidence": top[0]["confidence"], "top": top, "modelVersion": VERSION}

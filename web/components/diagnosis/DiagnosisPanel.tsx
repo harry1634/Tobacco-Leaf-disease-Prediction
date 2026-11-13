@@ -9,6 +9,15 @@ import { ALLOWED_TYPES,inferenceUrl, predict, validateImage, type Prediction } f
 
 type Status = "idle" | "running" | "done" | "error";
 
+// How to read the model's confidence. The bands are plain-language guidance, not guarantees: on the project's held-out
+// photos, answers shown at 90% or more were right far more often than answers shown below 50%, but the test set is small.
+function confidenceBand(c: number): { label: string; message: string; warn: boolean } {
+  if (c >= 0.9) return { label: "High", warn: false, message: "The model is fairly sure. It is still an estimate, so confirm with an expert before acting." };
+  if (c >= 0.7) return { label: "Moderate", warn: false, message: "The model leans this way, but other conditions are possible. Check the other guesses below." };
+  if (c >= 0.5) return { label: "Low", warn: true, message: "The model is not very sure. Compare the other guesses below and try a clearer photo." };
+  return { label: "Very low", warn: true, message: "The model could not decide. Treat this as unknown, and try a closer, sharper photo of one affected area in good light." };
+}
+
 export function DiagnosisPanel() {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
@@ -56,6 +65,7 @@ export function DiagnosisPanel() {
 
   const connected = Boolean(inferenceUrl);
   const info = result ? DISEASES[result.label] : undefined;
+  const band = result ? confidenceBand(result.confidence) : null;
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -67,6 +77,15 @@ export function DiagnosisPanel() {
           aria-describedby={fileError ? "leaf-err" : undefined} aria-invalid={Boolean(fileError)}
           className="mt-1 block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-medium file:text-background hover:file:bg-primary-hover" />
         {fileError && <p id="leaf-err" role="alert" className="mt-2 text-sm text-warning">{fileError}</p>}
+        <details className="mt-3 rounded-md border border-border p-3 text-sm">
+          <summary className="cursor-pointer font-medium">Tips for a more reliable result</summary>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
+            <li>Photograph one leaf, filling most of the frame, with the affected area in focus.</li>
+            <li>Use daylight without strong shadows, and a plain background.</li>
+            <li>Avoid blur, heavy filters and photos of a screen.</li>
+            <li>If the result is uncertain, try a second photo of a different spot on the same leaf.</li>
+          </ul>
+        </details>
 
         {previewUrl && (
           // eslint-disable-next-line @next/next/no-img-element -- local blob URL preview; next/image cannot optimise it
@@ -94,7 +113,7 @@ export function DiagnosisPanel() {
         {status === "done" && result && (
           <div className="mt-3 space-y-3">
             <dl>
-              <dt className="text-sm text-muted">Predicted class</dt>
+              <dt className="text-sm text-muted">{result.confidence < 0.5 ? "Most likely (uncertain)" : "Predicted class"}</dt>
               <dd className="text-xl font-semibold">{niceName(result.label)}</dd>
               {info && <dd className="text-sm text-muted">Model label: {result.label}</dd>}
             </dl>
@@ -114,12 +133,14 @@ export function DiagnosisPanel() {
               <dt className="text-sm text-muted">Confidence</dt>
               <dd>
                 <span className="text-xl font-semibold">{(result.confidence * 100).toFixed(1)}%</span>
+                {band && <span className="ml-2 rounded-full bg-primary-soft px-2 py-0.5 text-xs font-medium">{band.label}</span>}
                 <span className="mt-1 block h-2 w-full overflow-hidden rounded-full bg-primary-soft" aria-hidden><span className="block h-full bg-primary" style={{ width: `${result.confidence * 100}%` }} /></span>
+                <span className="mt-1 block text-xs text-muted">How sure the model is, averaged over four views of your photo. It is judged against the project&apos;s own photos, so pictures from other cameras or lighting can look less certain.</span>
               </dd>
             </dl>
-            {result.confidence < 0.5 && (
-              <p role="status" className="rounded-md bg-warning-soft p-3 text-sm text-warning">
-                Low confidence. The model is unsure about this image, so treat the result with caution.
+            {band && (
+              <p role="status" className={`rounded-md p-3 text-sm ${band.warn ? "bg-warning-soft text-warning" : "bg-primary-soft"}`}>
+                {band.message}
               </p>
             )}
             {result.top && result.top.length > 1 && (
@@ -141,6 +162,13 @@ export function DiagnosisPanel() {
               This is a model estimate, not a professional diagnosis. Photos taken with different cameras or lighting than the
               training data may be less reliable.{result.modelVersion ? ` Model: ${result.modelVersion}.` : ""}
             </p>
+            <details className="rounded-md border border-border p-3 text-sm">
+              <summary className="cursor-pointer font-medium">Why might another AI tool name a different disease?</summary>
+              <div className="mt-2 space-y-2 text-muted">
+                <p>This model only knows the 16 conditions of one research dataset (tobacco leaves) and has never seen others. A general-purpose AI tool was not trained on this data and may name a condition outside this list, and either tool can be wrong.</p>
+                <p>Several tobacco problems look alike (for example frogeye leaf spot, brown spot and weather fleck), so a single photo is often ambiguous. Neither tool is the ground truth: only an expert or a laboratory test can confirm the cause. When the answers disagree, treat both as leads and look at the other guesses above.</p>
+              </div>
+            </details>
           </div>
         )}
       </section>

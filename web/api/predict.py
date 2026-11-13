@@ -22,7 +22,7 @@ from PIL import Image, UnidentifiedImageError
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from _preprocess import prepare_image  # noqa: E402
+from _preprocess import average_probabilities, prepare_image, tta_views  # noqa: E402
 
 MAX_BYTES = 4 * 1024 * 1024
 ALLOWED = {"image/jpeg", "image/png", "image/webp"}
@@ -31,6 +31,7 @@ _meta = json.loads((HERE / "_model" / "classes.json").read_text(encoding="utf-8"
 CLASS_NAMES: list[str] = _meta["classNames"]
 IMG_SIZE: int = int(_meta["imgSize"])
 VERSION: str = _meta["modelVersion"]
+TEMPERATURE: float = float(_meta.get("temperature", 1.0))  # fitted on validation photos; see docs/deployment.md
 _session = ort.InferenceSession(str(HERE / "_model" / "model.onnx"), providers=["CPUExecutionProvider"])
 
 app = FastAPI(title="Tobacco leaf diagnosis")
@@ -54,10 +55,9 @@ async def _predict(file: UploadFile) -> dict:
     except (UnidentifiedImageError, OSError):
         raise HTTPException(400, "The file is not a readable image.")
 
-    x = prepare_image(img, IMG_SIZE)[None]
-    logits = _session.run(None, {"input": x})[0][0].astype(np.float64)
-    probs = np.exp(logits - logits.max())
-    probs /= probs.sum()
+    x = tta_views(prepare_image(img, IMG_SIZE))  # the photo seen four ways; the answers are averaged
+    logits = _session.run(None, {"input": x})[0].astype(np.float64)
+    probs = average_probabilities(logits, TEMPERATURE)
     order = np.argsort(-probs)[:3]
     top = [{"label": CLASS_NAMES[i], "confidence": float(probs[i])} for i in order]
     return {"label": top[0]["label"], "confidence": top[0]["confidence"], "top": top, "modelVersion": VERSION}

@@ -30,6 +30,14 @@ Nothing here has been done for you: deploying and creating accounts are your dec
 
 ## Real predictions on the deployed site (ONNX function on Vercel)
 
+**How the confidence is produced.** The function shows the model four views of each photo (as is, two mirror images and a 90-degree turn), averages the four answers, and rescales the scores with a calibration temperature stored in `web/api/_model/classes.json` (`temperature`, currently 0.55). The user still uploads a single photo; the four views are made in the backend.
+
+The temperature was fitted on validation photos only, with the tuned centralised model. Its purpose is that the number shown matches how often the model is right, not to make the number look bigger.
+
+Measured on the 138 held-out test photos with that model: accuracy 82.6% with a single view and 88.4% with four views; average confidence shown 89.5%; share of photos shown below 50% confidence 14.5% before and 4.3% after. Answers shown at 90% or more were right 94 times out of 99, answers shown at 50-70% about 71% of the time, and answers shown below 50% only 3 times out of 6.
+
+Two honest limits. First, the deployed model (`final_all`) was trained on all photos, so these numbers could not be re-measured for it and the temperature is carried over from the same recipe. Second, sharper confidence also makes wrong answers look more confident (73.5% on average when wrong, against 52.4% before), so confidence separates right from wrong slightly less well than before. Photos from other cameras and lighting still tend to get lower confidence, which is the correct signal.
+
 The model in `web/api/_model/` is `final_all`: trained on all 1,398 real photos, so it has no held-out score (see the README). Its parity check against PyTorch (138/138 same class) only shows the conversion is faithful, not that the model is accurate.
 
 Hugging Face Docker Spaces now need a paid plan, so the model runs as a Vercel Python function instead, next to the website (same address, free Hobby plan, no second host).

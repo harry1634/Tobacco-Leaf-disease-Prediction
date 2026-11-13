@@ -84,3 +84,22 @@ def test_deployed_function_uses_identical_preprocessing():
     web_copy = ML_ROOT.parent / "web" / "api" / "_preprocess.py"
     original = ML_ROOT / "src" / "serve" / "preprocess.py"
     assert web_copy.read_text(encoding="utf-8") == original.read_text(encoding="utf-8")
+
+
+def test_tta_views_are_the_four_expected_orientations():
+    from src.serve.preprocess import VIEWS, tta_views
+    x = np.arange(3 * 4 * 4, dtype=np.float32).reshape(3, 4, 4)
+    v = tta_views(x)
+    assert v.shape == (VIEWS, 3, 4, 4) and v.dtype == np.float32
+    assert np.array_equal(v[0], x) and np.array_equal(v[1], x[:, :, ::-1]) and np.array_equal(v[2], x[:, ::-1, :])
+    assert np.array_equal(v[3], np.rot90(x, 1, axes=(1, 2)))
+
+
+def test_average_probabilities_sum_to_one_and_temperature_sharpens():
+    from src.serve.preprocess import average_probabilities
+    logits = np.array([[2.0, 1.0, 0.0], [1.5, 1.2, 0.1], [2.2, 0.5, 0.3], [1.0, 1.0, 0.2]])
+    p1, p_sharp, p_soft = (average_probabilities(logits, t) for t in (1.0, 0.5, 2.0))
+    for p in (p1, p_sharp, p_soft):
+        assert abs(p.sum() - 1.0) < 1e-9 and (p >= 0).all()
+    assert p_sharp.max() > p1.max() > p_soft.max()          # T < 1 sharpens, T > 1 softens
+    assert p_sharp.argmax() == p1.argmax() == p_soft.argmax()  # calibration never changes WHICH disease is named

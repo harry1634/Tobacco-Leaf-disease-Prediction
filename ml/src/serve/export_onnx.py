@@ -26,6 +26,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="centralised_224")
     ap.add_argument("--out", default=str(ML_ROOT.parent / "web" / "api" / "_model"))
+    ap.add_argument("--temperature", type=float, help="calibration temperature (default: outputs/<model>/calibration.json, else 1.0)")
     a = ap.parse_args()
 
     ckpt = torch.load(ML_ROOT / "outputs" / a.model / "model.pt", map_location="cpu", weights_only=False)
@@ -39,7 +40,9 @@ def main() -> None:
     dummy = torch.zeros(1, 3, size, size)
     torch.onnx.export(model, dummy, str(out / "model.onnx"), input_names=["input"], output_names=["logits"],
                       dynamic_axes={"input": {0: "batch"}, "logits": {0: "batch"}}, opset_version=17, dynamo=False)
-    (out / "classes.json").write_text(json.dumps({"classNames": names, "imgSize": size, "modelVersion": f"{a.model}-mobilenet_v2-{size}px"}), encoding="utf-8")
+    calib = ML_ROOT / "outputs" / a.model / "calibration.json"
+    temperature = a.temperature or (json.loads(calib.read_text(encoding="utf-8"))["temperature"] if calib.is_file() else 1.0)
+    (out / "classes.json").write_text(json.dumps({"classNames": names, "imgSize": size, "modelVersion": f"{a.model}-mobilenet_v2-{size}px-tta4", "temperature": temperature}), encoding="utf-8")
     print(f"wrote {out / 'model.onnx'} ({(out / 'model.onnx').stat().st_size / 1e6:.1f} MB)")
 
     import onnxruntime as ort
